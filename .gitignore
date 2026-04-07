@@ -1,0 +1,12 @@
+logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+node_modules
+dist
+dist-ssr
+*.local
+.env
+.DS_Store

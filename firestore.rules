@@ -1,0 +1,38 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    // Admins are represented only as documents admins/{authUid}. Add/remove those in the
+    // Firebase console or with the Admin SDK — no admin identifiers live in this rules file
+    // or in app source.
+    match /admins/{userId} {
+      allow read: if signedIn() && request.auth.uid == userId;
+      allow create, update, delete: if false;
+    }
+
+    function isCatalogAdmin() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    match /a10-clubhouse/{productId} {
+      allow read: if true;
+      allow create, update, delete: if isCatalogAdmin();
+    }
+
+    match /score-keeper-rooms/{document=**} {
+      allow read, write: if true;
+    }
+
+    match /pp-games/{document=**} {
+      allow read, write: if true;
+    }
+
+    match /shared-logins/{document=**} {
+      allow read, write: if true;
+    }
+  }
+}
