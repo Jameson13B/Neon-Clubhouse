@@ -1,12 +1,9 @@
-import { useEffect } from "react"
 import type { Product } from "../types/product"
 import { STATUS_LABELS } from "../types/product"
 import { Badge, statusTone } from "../ui/Badge"
 import { Card } from "../ui/Card"
 import { Stack } from "../ui/Stack"
 import { formatMoney } from "../lib/format"
-import { tcgdex } from "../lib/tcgdex"
-import { Query } from "@tcgdex/sdk"
 
 type Props = { product: Product }
 
@@ -15,16 +12,6 @@ export function ProductCard({ product }: Props) {
     product.market > 0
       ? Math.round(100 - (product.cost / product.market) * 100)
       : 0
-
-  useEffect(() => {
-    async function fetchCards() {
-      const filteredCards = await tcgdex.card.list(
-        Query.create().equal("name", product.name), // ID contains "5"
-      )
-      console.log(filteredCards)
-    }
-    fetchCards()
-  }, [product.name])
 
   return (
     <Card

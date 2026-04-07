@@ -85,6 +85,25 @@ function productToForm(p: Product): ProductInput {
   }
 }
 
+function productMatchesInventorySearch(p: Product, query: string): boolean {
+  const q = query.trim().toLowerCase()
+  if (!q) return true
+  const blob = [
+    p.name,
+    p.series,
+    p.set,
+    p.type,
+    p.contents,
+    STATUS_LABELS[p.status],
+    String(p.quantity),
+    formatMoney(p.cost),
+    formatMoney(p.market),
+  ]
+    .join(" ")
+    .toLowerCase()
+  return blob.includes(q)
+}
+
 export function AdminPage() {
   const { products, loading, error, configured } = useProducts()
   const {
@@ -109,8 +128,15 @@ export function AdminPage() {
   const verifierRef = useRef<RecaptchaVerifier | null>(null)
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
+  const [inventorySearch, setInventorySearch] = useState("")
 
   const isAuthed = Boolean(user)
+
+  const filteredInventory = useMemo(
+    () =>
+      products.filter((p) => productMatchesInventorySearch(p, inventorySearch)),
+    [products, inventorySearch],
+  )
 
   useLayoutEffect(() => {
     if (!configured || !canUseAuth || !ready || isAuthed || codeSent) {
@@ -467,12 +493,14 @@ export function AdminPage() {
       ) : null}
 
       {canManage ? (
-        <Stack
-          direction="row"
-          gap={5}
-          align="flex-start"
-          wrap
-          style={{ alignItems: "stretch" }}
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            flexWrap: "wrap",
+            gap: 20,
+            alignItems: "stretch",
+          }}
         >
           <Card padding="lg" style={{ flex: "1 1 320px", minWidth: 280 }}>
             <Stack gap={3}>
@@ -637,9 +665,36 @@ export function AdminPage() {
             </Stack>
           </Card>
 
-          <Card padding="lg" style={{ flex: "1 1 360px", minWidth: 280 }}>
-            <Stack gap={3}>
+          <Card
+            padding="lg"
+            style={{
+              flex: "1 1 360px",
+              minWidth: 280,
+              display: "flex",
+              flexDirection: "column",
+              minHeight: 0,
+              maxHeight: "calc(100vh - 220px)",
+              overflow: "hidden",
+            }}
+          >
+            <Stack
+              gap={3}
+              style={{
+                flex: 1,
+                minHeight: 0,
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
               <h2 style={{ margin: 0, fontSize: "1.1rem" }}>Inventory</h2>
+              <Input
+                type="search"
+                placeholder="Search inventory…"
+                value={inventorySearch}
+                onChange={(e) => setInventorySearch(e.target.value)}
+                aria-label="Filter inventory list"
+                autoComplete="off"
+              />
               {loading ? (
                 <p style={{ margin: 0, color: "var(--color-text-muted)" }}>
                   Loading…
@@ -648,9 +703,22 @@ export function AdminPage() {
                 <p style={{ margin: 0, color: "var(--color-text-muted)" }}>
                   No products yet.
                 </p>
+              ) : filteredInventory.length === 0 ? (
+                <p style={{ margin: 0, color: "var(--color-text-muted)" }}>
+                  No products match &quot;{inventorySearch.trim()}&quot;.
+                </p>
               ) : (
-                <Stack gap={2}>
-                  {products.map((p) => (
+                <div
+                  style={{
+                    flex: 1,
+                    minHeight: 0,
+                    overflowY: "auto",
+                    paddingRight: 4,
+                    marginRight: -4,
+                  }}
+                >
+                  <Stack gap={2}>
+                    {filteredInventory.map((p) => (
                     <div
                       key={p.id}
                       style={{
@@ -734,12 +802,13 @@ export function AdminPage() {
                         </Stack>
                       </Stack>
                     </div>
-                  ))}
-                </Stack>
+                    ))}
+                  </Stack>
+                </div>
               )}
             </Stack>
           </Card>
-        </Stack>
+        </div>
       ) : null}
     </Stack>
   )
