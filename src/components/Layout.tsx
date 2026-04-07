@@ -1,20 +1,20 @@
-import type { CSSProperties } from "react"
-import { NavLink, Outlet } from "react-router-dom"
-import { useAuth } from "../context/AuthContext"
-import { Stack } from "../ui/Stack"
+import type { CSSProperties } from 'react'
+import { NavLink, Outlet } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
+import { Stack } from '../ui/Stack'
 
 const linkStyle: CSSProperties = {
-  padding: "8px 12px",
-  borderRadius: "var(--radius-sm)",
-  color: "var(--color-text-muted)",
+  padding: '8px 12px',
+  borderRadius: 'var(--radius-sm)',
+  color: 'var(--color-text-muted)',
   fontWeight: 600,
-  fontSize: "0.9rem",
+  fontSize: '0.9rem',
 }
 
 const activeStyle: CSSProperties = {
   ...linkStyle,
-  background: "var(--color-surface-hover)",
-  color: "var(--color-text)",
+  background: 'var(--color-surface-hover)',
+  color: 'var(--color-text)',
 }
 
 export function Layout() {
@@ -23,14 +23,14 @@ export function Layout() {
 
   return (
     <div
-      style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}
+      style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}
     >
       <header
         style={{
-          borderBottom: "1px solid var(--color-border)",
-          background: "rgba(15, 20, 25, 0.85)",
-          backdropFilter: "blur(8px)",
-          position: "sticky",
+          borderBottom: '1px solid var(--color-border)',
+          background: 'rgba(15, 20, 25, 0.85)',
+          backdropFilter: 'blur(8px)',
+          position: 'sticky',
           top: 0,
           zIndex: 10,
         }}
@@ -41,36 +41,56 @@ export function Layout() {
           justify="space-between"
           style={{
             maxWidth: 1100,
-            margin: "0 auto",
-            padding: "var(--space-4) var(--space-5)",
+            margin: '0 auto',
+            padding: 'var(--space-4) var(--space-5)',
           }}
         >
           <NavLink
             to="/"
             style={{
               fontWeight: 700,
-              fontSize: "1.3rem",
-              color: "var(--color-text)",
+              fontSize: '1.3rem',
+              color: 'var(--color-text)',
             }}
           >
             Neon Clubhouse
             <span
               style={{
-                fontSize: "0.8rem",
-                color: "var(--color-text-muted)",
+                fontSize: '0.8rem',
+                color: 'var(--color-text-muted)',
                 marginLeft: 6,
               }}
             >
               by Atomic10 Studio
             </span>
           </NavLink>
-          <nav style={{ display: "flex", gap: 8 }}>
+          <nav style={{ display: 'flex', gap: 8 }}>
             <NavLink
-              to="/"
-              end
-              style={({ isActive }) => (isActive ? activeStyle : linkStyle)}
+              to="/catalog"
+              title="Catalog"
+              aria-label="Catalog"
+              style={({ isActive }) => ({
+                ...(isActive ? activeStyle : linkStyle),
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              })}
             >
-              Catalog
+              <svg
+                width={20}
+                height={20}
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden
+              >
+                <circle cx={9} cy={21} r={1} />
+                <circle cx={20} cy={21} r={1} />
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+              </svg>
             </NavLink>
             {showAdminNav ? (
               <NavLink
@@ -79,9 +99,9 @@ export function Layout() {
                 aria-label="Settings"
                 style={({ isActive }) => ({
                   ...(isActive ? activeStyle : linkStyle),
-                  display: "inline-flex",
-                  alignItems: "center",
-                  justifyContent: "center",
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                 })}
               >
                 <svg
@@ -107,9 +127,9 @@ export function Layout() {
         style={{
           flex: 1,
           maxWidth: 1100,
-          width: "100%",
-          margin: "0 auto",
-          padding: "var(--space-6) var(--space-5)",
+          width: '100%',
+          margin: '0 auto',
+          padding: 'var(--space-6) var(--space-5)',
         }}
       >
         <Outlet />

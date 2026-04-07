@@ -1,38 +1,38 @@
-import { RecaptchaVerifier, type User } from "firebase/auth"
-import { FormEvent, useLayoutEffect, useMemo, useRef, useState } from "react"
-import { SetupBanner } from "../components/SetupBanner"
-import { useAuth } from "../context/AuthContext"
-import { formatFirebaseAuthError, getFirebase } from "../lib/firebase"
-import { useProducts } from "../hooks/useProducts"
+import { RecaptchaVerifier, type User } from 'firebase/auth'
+import { FormEvent, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { SetupBanner } from '../components/SetupBanner'
+import { useAuth } from '../context/AuthContext'
+import { formatFirebaseAuthError, getFirebase } from '../lib/firebase'
+import { useProducts } from '../hooks/useProducts'
 import {
   createProduct,
   removeProduct,
   updateProduct,
-} from "../services/products"
-import type { Product, ProductInput, ProductStatus } from "../types/product"
-import { PRODUCT_STATUSES, STATUS_LABELS } from "../types/product"
-import { Badge, statusTone } from "../ui/Badge"
-import { Button } from "../ui/Button"
-import { Card } from "../ui/Card"
-import { FormField } from "../ui/FormField"
-import { Input } from "../ui/Input"
-import { Select } from "../ui/Select"
-import { Stack } from "../ui/Stack"
-import { Textarea } from "../ui/Textarea"
-import { formatMoney } from "../lib/format"
+} from '../services/products'
+import type { Product, ProductInput, ProductStatus } from '../types/product'
+import { PRODUCT_STATUSES, STATUS_LABELS } from '../types/product'
+import { Badge, statusTone } from '../ui/Badge'
+import { Button } from '../ui/Button'
+import { Card } from '../ui/Card'
+import { FormField } from '../ui/FormField'
+import { Input } from '../ui/Input'
+import { Select } from '../ui/Select'
+import { Stack } from '../ui/Stack'
+import { Textarea } from '../ui/Textarea'
+import { formatMoney } from '../lib/format'
 
 function emptyForm(): ProductInput {
   return {
-    name: "",
-    contents: "",
-    set: "",
-    series: "",
-    type: "",
+    name: '',
+    contents: '',
+    set: '',
+    series: '',
+    type: '',
     market: 0,
     cost: 0,
     quantity: 0,
-    status: "in_stock",
-    imageUrl: "",
+    status: 'in_stock',
+    imageUrl: '',
   }
 }
 
@@ -45,9 +45,9 @@ function normalizePhoneForFirebase(input: string): string | null {
   const trimmed = input.trim()
   if (!trimmed) return null
 
-  const hasLeadingPlus = trimmed.startsWith("+") || trimmed.startsWith("\uFF0B")
+  const hasLeadingPlus = trimmed.startsWith('+') || trimmed.startsWith('\uFF0B')
   const body = hasLeadingPlus ? trimmed.slice(1) : trimmed
-  const digits = body.replace(/\D/g, "")
+  const digits = body.replace(/\D/g, '')
   if (!digits) return null
 
   if (hasLeadingPlus) {
@@ -58,7 +58,7 @@ function normalizePhoneForFirebase(input: string): string | null {
   if (digits.length === 10) {
     return `+1${digits}`
   }
-  if (digits.length === 11 && digits.startsWith("1")) {
+  if (digits.length === 11 && digits.startsWith('1')) {
     return `+${digits}`
   }
 
@@ -66,7 +66,7 @@ function normalizePhoneForFirebase(input: string): string | null {
 }
 
 function displayAuthIdentity(user: User | null): string {
-  if (!user) return ""
+  if (!user) return ''
   return user.phoneNumber ?? user.email ?? user.uid
 }
 
@@ -99,7 +99,7 @@ function productMatchesInventorySearch(p: Product, query: string): boolean {
     formatMoney(p.cost),
     formatMoney(p.market),
   ]
-    .join(" ")
+    .join(' ')
     .toLowerCase()
   return blob.includes(q)
 }
@@ -119,8 +119,8 @@ export function AdminPage() {
   } = useAuth()
   const [editingId, setEditingId] = useState<string | null>(null)
   const [form, setForm] = useState<ProductInput>(emptyForm)
-  const [phone, setPhone] = useState("")
-  const [smsCode, setSmsCode] = useState("")
+  const [phone, setPhone] = useState('')
+  const [smsCode, setSmsCode] = useState('')
   const [codeSent, setCodeSent] = useState(false)
   const [lastSentE164, setLastSentE164] = useState<string | null>(null)
   const [recaptchaKey, setRecaptchaKey] = useState(0)
@@ -128,7 +128,7 @@ export function AdminPage() {
   const verifierRef = useRef<RecaptchaVerifier | null>(null)
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
-  const [inventorySearch, setInventorySearch] = useState("")
+  const [inventorySearch, setInventorySearch] = useState('')
 
   const isAuthed = Boolean(user)
 
@@ -147,7 +147,7 @@ export function AdminPage() {
     if (!el) return
     const { auth } = getFirebase()
     const verifier = new RecaptchaVerifier(auth, el, {
-      size: "compact",
+      size: 'compact',
       callback: () => {
         /* token is picked up by verify() */
       },
@@ -165,7 +165,7 @@ export function AdminPage() {
   const canManage = configured && canUseAuth && isAuthed && isAdmin
 
   const title = useMemo(
-    () => (editingId ? "Edit product" : "Add product"),
+    () => (editingId ? 'Edit product' : 'Add product'),
     [editingId],
   )
 
@@ -177,10 +177,10 @@ export function AdminPage() {
     try {
       if (editingId) {
         await updateProduct(editingId, form)
-        setMessage("Product updated.")
+        setMessage('Product updated.')
       } else {
         await createProduct(form)
-        setMessage("Product created.")
+        setMessage('Product created.')
         setForm(emptyForm())
       }
     } catch (err) {
@@ -194,7 +194,7 @@ export function AdminPage() {
 
   async function onDelete(id: string) {
     if (!canManage) return
-    if (!window.confirm("Delete this product? This cannot be undone.")) return
+    if (!window.confirm('Delete this product? This cannot be undone.')) return
     setBusy(true)
     setMessage(null)
     try {
@@ -203,7 +203,7 @@ export function AdminPage() {
         setEditingId(null)
         setForm(emptyForm())
       }
-      setMessage("Product removed.")
+      setMessage('Product removed.')
     } catch (err) {
       setMessage((err as Error).message)
     } finally {
@@ -227,13 +227,13 @@ export function AdminPage() {
     e.preventDefault()
     const verifier = verifierRef.current
     if (!verifier) {
-      setMessage("Sign-in is not ready yet. Refresh the page and try again.")
+      setMessage('Sign-in is not ready yet. Refresh the page and try again.')
       return
     }
     const e164 = normalizePhoneForFirebase(phone)
     if (!e164) {
       setMessage(
-        "Use a full international number: start with + and your country code (e.g. US +1 555 234 5678). You can also enter 10 US digits without +.",
+        'Use a full international number: start with + and your country code (e.g. US +1 555 234 5678). You can also enter 10 US digits without +.',
       )
       return
     }
@@ -243,9 +243,9 @@ export function AdminPage() {
       await sendPhoneVerificationCode(e164, verifier)
       setLastSentE164(e164)
       setCodeSent(true)
-      setSmsCode("")
+      setSmsCode('')
     } catch (errUnknown) {
-      console.error("[phone auth] send code failed", errUnknown)
+      console.error('[phone auth] send code failed', errUnknown)
       setMessage(formatFirebaseAuthError(errUnknown))
       resetPhoneVerification()
       setCodeSent(false)
@@ -263,7 +263,7 @@ export function AdminPage() {
     try {
       await confirmPhoneCode(smsCode)
     } catch (errUnknown) {
-      console.error("[phone auth] confirm code failed", errUnknown)
+      console.error('[phone auth] confirm code failed', errUnknown)
       setMessage(formatFirebaseAuthError(errUnknown))
     } finally {
       setBusy(false)
@@ -274,7 +274,7 @@ export function AdminPage() {
     resetPhoneVerification()
     setCodeSent(false)
     setLastSentE164(null)
-    setSmsCode("")
+    setSmsCode('')
     setMessage(null)
     setRecaptchaKey((k) => k + 1)
   }
@@ -282,7 +282,7 @@ export function AdminPage() {
   if (!configured) {
     return (
       <Stack gap={4}>
-        <h1 style={{ margin: 0, fontSize: "1.75rem", fontWeight: 700 }}>
+        <h1 style={{ margin: 0, fontSize: '1.75rem', fontWeight: 700 }}>
           Admin Dashboard
         </h1>
         <SetupBanner />
@@ -291,20 +291,20 @@ export function AdminPage() {
   }
 
   if (!ready) {
-    return <p style={{ color: "var(--color-text-muted)" }}>Loading…</p>
+    return <p style={{ color: 'var(--color-text-muted)' }}>Loading…</p>
   }
 
   return (
     <Stack gap={5}>
       <div>
-        <h1 style={{ margin: "0 0 8px", fontSize: "1.75rem", fontWeight: 700 }}>
+        <h1 style={{ margin: '0 0 8px', fontSize: '1.75rem', fontWeight: 700 }}>
           Admin Dashboard
         </h1>
         {!isAuthed && (
           <p
             style={{
               margin: 0,
-              color: "var(--color-text-muted)",
+              color: 'var(--color-text-muted)',
               maxWidth: 620,
             }}
           >
@@ -335,15 +335,15 @@ export function AdminPage() {
                 <p
                   style={{
                     margin: 0,
-                    color: "var(--color-text-muted)",
-                    fontSize: "0.85rem",
+                    color: 'var(--color-text-muted)',
+                    fontSize: '0.85rem',
                   }}
                 >
                   Complete the security check, then send the code.
                 </p>
                 <div ref={recaptchaContainerRef} key={recaptchaKey} />
-                <Button type="submit" disabled={busy} style={{ width: "100%" }}>
-                  {busy ? "Sending code…" : "Send verification code"}
+                <Button type="submit" disabled={busy} style={{ width: '100%' }}>
+                  {busy ? 'Sending code…' : 'Send verification code'}
                 </Button>
               </Stack>
             </form>
@@ -354,13 +354,13 @@ export function AdminPage() {
                 <p
                   style={{
                     margin: 0,
-                    color: "var(--color-text-muted)",
-                    fontSize: "0.9rem",
+                    color: 'var(--color-text-muted)',
+                    fontSize: '0.9rem',
                   }}
                 >
-                  We sent a code to{" "}
-                  <strong style={{ color: "var(--color-text)" }}>
-                    {lastSentE164 ?? "your number"}
+                  We sent a code to{' '}
+                  <strong style={{ color: 'var(--color-text)' }}>
+                    {lastSentE164 ?? 'your number'}
                   </strong>
                   .
                 </p>
@@ -375,8 +375,8 @@ export function AdminPage() {
                     required
                   />
                 </FormField>
-                <Button type="submit" disabled={busy} style={{ width: "100%" }}>
-                  {busy ? "Verifying…" : "Verify and sign in"}
+                <Button type="submit" disabled={busy} style={{ width: '100%' }}>
+                  {busy ? 'Verifying…' : 'Verify and sign in'}
                 </Button>
                 <Button
                   type="button"
@@ -397,41 +397,41 @@ export function AdminPage() {
             <p
               style={{
                 margin: 0,
-                color: "var(--color-text-muted)",
-                fontSize: "0.95rem",
+                color: 'var(--color-text-muted)',
+                fontSize: '0.95rem',
               }}
             >
-              Signed in as{" "}
-              <strong style={{ color: "var(--color-text)" }}>
+              Signed in as{' '}
+              <strong style={{ color: 'var(--color-text)' }}>
                 {displayAuthIdentity(user)}
               </strong>
-              . Admin access requires a Firestore document whose{" "}
-              <strong>document ID is exactly your Firebase Auth user ID</strong>{" "}
-              (not your phone number), in the{" "}
-              <code style={{ fontFamily: "var(--font-mono)" }}>admins</code>{" "}
+              . Admin access requires a Firestore document whose{' '}
+              <strong>document ID is exactly your Firebase Auth user ID</strong>{' '}
+              (not your phone number), in the{' '}
+              <code style={{ fontFamily: 'var(--font-mono)' }}>admins</code>{' '}
               collection.
             </p>
             {user?.uid ? (
               <p
                 style={{
                   margin: 0,
-                  fontSize: "0.9rem",
-                  color: "var(--color-text-muted)",
+                  fontSize: '0.9rem',
+                  color: 'var(--color-text-muted)',
                 }}
               >
-                <span style={{ display: "block", marginBottom: 6 }}>
+                <span style={{ display: 'block', marginBottom: 6 }}>
                   Use this document ID in Firestore:
                 </span>
                 <code
                   style={{
-                    display: "block",
-                    padding: "8px 10px",
-                    borderRadius: "var(--radius-md)",
-                    background: "var(--color-surface-hover)",
-                    fontFamily: "var(--font-mono)",
-                    fontSize: "0.82rem",
-                    wordBreak: "break-all",
-                    color: "var(--color-text)",
+                    display: 'block',
+                    padding: '8px 10px',
+                    borderRadius: 'var(--radius-md)',
+                    background: 'var(--color-surface-hover)',
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '0.82rem',
+                    wordBreak: 'break-all',
+                    color: 'var(--color-text)',
                   }}
                 >
                   {user.uid}
@@ -442,8 +442,8 @@ export function AdminPage() {
               <p
                 style={{
                   margin: 0,
-                  fontSize: "0.9rem",
-                  color: "var(--color-danger)",
+                  fontSize: '0.9rem',
+                  color: 'var(--color-danger)',
                 }}
                 role="alert"
               >
@@ -458,10 +458,10 @@ export function AdminPage() {
       ) : (
         <Stack direction="row" justify="space-between" align="center" wrap>
           <span
-            style={{ color: "var(--color-text-muted)", fontSize: "0.9rem" }}
+            style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem' }}
           >
-            Signed in as{" "}
-            <strong style={{ color: "var(--color-text)" }}>
+            Signed in as{' '}
+            <strong style={{ color: 'var(--color-text)' }}>
               {displayAuthIdentity(user)}
             </strong>
           </span>
@@ -479,8 +479,8 @@ export function AdminPage() {
               /permission-denied|invalid|wrong password|invalid credential|invalid-verification|missing or insufficient|network|failed|too-many|quota|reCAPTCHA|session-expired/i.test(
                 message,
               )
-                ? "var(--color-danger)"
-                : "var(--color-success)",
+                ? 'var(--color-danger)'
+                : 'var(--color-success)',
           }}
           role="status"
         >
@@ -488,7 +488,7 @@ export function AdminPage() {
         </p>
       ) : null}
       {error ? (
-        <p style={{ margin: 0, color: "var(--color-danger)" }} role="alert">
+        <p style={{ margin: 0, color: 'var(--color-danger)' }} role="alert">
           {error}
         </p>
       ) : null}
@@ -496,14 +496,14 @@ export function AdminPage() {
       {canManage ? (
         <div
           style={{
-            display: "flex",
-            flexDirection: "row",
-            flexWrap: "wrap",
+            display: 'flex',
+            flexDirection: 'row',
+            flexWrap: 'wrap',
             gap: 20,
-            alignItems: "stretch",
+            alignItems: 'stretch',
           }}
         >
-          <Card padding="lg" style={{ flex: "1 1 320px", minWidth: 280 }}>
+          <Card padding="lg" style={{ flex: '1 1 320px', minWidth: 280 }}>
             <Stack gap={3}>
               <Stack
                 direction="row"
@@ -511,7 +511,7 @@ export function AdminPage() {
                 align="center"
                 wrap
               >
-                <h2 style={{ margin: 0, fontSize: "1.1rem" }}>{title}</h2>
+                <h2 style={{ margin: 0, fontSize: '1.1rem' }}>{title}</h2>
                 {editingId ? (
                   <Button variant="ghost" type="button" onClick={startNew}>
                     New product
@@ -530,7 +530,7 @@ export function AdminPage() {
                     />
                   </FormField>
                   <Stack direction="row" gap={3} wrap>
-                    <div style={{ flex: "1 1 140px", minWidth: 0 }}>
+                    <div style={{ flex: '1 1 140px', minWidth: 0 }}>
                       <FormField label="Series">
                         <Input
                           value={form.series}
@@ -541,7 +541,7 @@ export function AdminPage() {
                         />
                       </FormField>
                     </div>
-                    <div style={{ flex: "1 1 140px", minWidth: 0 }}>
+                    <div style={{ flex: '1 1 140px', minWidth: 0 }}>
                       <FormField label="Set">
                         <Input
                           value={form.set}
@@ -583,7 +583,7 @@ export function AdminPage() {
                     />
                   </FormField>
                   <Stack direction="row" gap={3} wrap>
-                    <div style={{ flex: "1 1 120px", minWidth: 0 }}>
+                    <div style={{ flex: '1 1 120px', minWidth: 0 }}>
                       <FormField label="Market / Resale (USD)">
                         <Input
                           type="number"
@@ -600,7 +600,7 @@ export function AdminPage() {
                         />
                       </FormField>
                     </div>
-                    <div style={{ flex: "1 1 120px", minWidth: 0 }}>
+                    <div style={{ flex: '1 1 120px', minWidth: 0 }}>
                       <FormField label="Cost / MSRP (USD)">
                         <Input
                           type="number"
@@ -617,7 +617,7 @@ export function AdminPage() {
                         />
                       </FormField>
                     </div>
-                    <div style={{ flex: "1 1 100px", minWidth: 0 }}>
+                    <div style={{ flex: '1 1 100px', minWidth: 0 }}>
                       <FormField label="Quantity">
                         <Input
                           type="number"
@@ -655,10 +655,10 @@ export function AdminPage() {
                   <Stack direction="row" gap={2} wrap>
                     <Button type="submit" disabled={busy}>
                       {busy
-                        ? "Saving…"
+                        ? 'Saving…'
                         : editingId
-                          ? "Save changes"
-                          : "Add product"}
+                          ? 'Save changes'
+                          : 'Add product'}
                     </Button>
                   </Stack>
                 </Stack>
@@ -669,13 +669,13 @@ export function AdminPage() {
           <Card
             padding="lg"
             style={{
-              flex: "1 1 360px",
+              flex: '1 1 360px',
               minWidth: 280,
-              display: "flex",
-              flexDirection: "column",
+              display: 'flex',
+              flexDirection: 'column',
               minHeight: 0,
-              maxHeight: "calc(100vh - 220px)",
-              overflow: "hidden",
+              maxHeight: 'calc(100vh - 220px)',
+              overflow: 'hidden',
             }}
           >
             <Stack
@@ -683,11 +683,11 @@ export function AdminPage() {
               style={{
                 flex: 1,
                 minHeight: 0,
-                display: "flex",
-                flexDirection: "column",
+                display: 'flex',
+                flexDirection: 'column',
               }}
             >
-              <h2 style={{ margin: 0, fontSize: "1.1rem" }}>Inventory</h2>
+              <h2 style={{ margin: 0, fontSize: '1.1rem' }}>Inventory</h2>
               <Input
                 type="search"
                 placeholder="Search inventory…"
@@ -697,15 +697,15 @@ export function AdminPage() {
                 autoComplete="off"
               />
               {loading ? (
-                <p style={{ margin: 0, color: "var(--color-text-muted)" }}>
+                <p style={{ margin: 0, color: 'var(--color-text-muted)' }}>
                   Loading…
                 </p>
               ) : products.length === 0 ? (
-                <p style={{ margin: 0, color: "var(--color-text-muted)" }}>
+                <p style={{ margin: 0, color: 'var(--color-text-muted)' }}>
                   No products yet.
                 </p>
               ) : filteredInventory.length === 0 ? (
-                <p style={{ margin: 0, color: "var(--color-text-muted)" }}>
+                <p style={{ margin: 0, color: 'var(--color-text-muted)' }}>
                   No products match &quot;{inventorySearch.trim()}&quot;.
                 </p>
               ) : (
@@ -713,7 +713,7 @@ export function AdminPage() {
                   style={{
                     flex: 1,
                     minHeight: 0,
-                    overflowY: "auto",
+                    overflowY: 'auto',
                     paddingRight: 4,
                     marginRight: -4,
                   }}
@@ -723,13 +723,13 @@ export function AdminPage() {
                       <div
                         key={p.id}
                         style={{
-                          border: "1px solid var(--color-border)",
-                          borderRadius: "var(--radius-md)",
+                          border: '1px solid var(--color-border)',
+                          borderRadius: 'var(--radius-md)',
                           padding: 12,
                           background:
                             editingId === p.id
-                              ? "var(--color-surface-hover)"
-                              : "var(--color-bg)",
+                              ? 'var(--color-surface-hover)'
+                              : 'var(--color-bg)',
                         }}
                       >
                         <Stack gap={2}>
@@ -737,45 +737,43 @@ export function AdminPage() {
                             direction="row"
                             justify="space-between"
                             align="flex-start"
-                            wrap
                           >
-                            <div>
+                            <div style={{ flex: 1, minWidth: 0 }}>
                               <div style={{ fontWeight: 700 }}>{p.name}</div>
                               <div
                                 style={{
-                                  fontSize: "0.85rem",
-                                  color: "var(--color-text-muted)",
+                                  fontSize: '0.85rem',
+                                  color: 'var(--color-text-muted)',
                                 }}
                               >
                                 {p.series} · {p.set}
-                                {p.type ? ` · ${p.type}` : ""} · Qty{" "}
+                                {p.type ? ` · ${p.type}` : ''} · Qty{' '}
                                 {p.quantity}
                               </div>
                               {p.contents ? (
                                 <div
                                   style={{
-                                    fontSize: "0.8rem",
-                                    color: "var(--color-text-muted)",
+                                    fontSize: '0.8rem',
+                                    color: 'var(--color-text-muted)',
                                     marginTop: 4,
-                                    maxWidth: "100%",
-                                    overflow: "hidden",
-                                    textOverflow: "ellipsis",
-                                    whiteSpace: "nowrap",
+                                    maxWidth: '100%',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
                                   }}
                                 >
                                   {p.contents}
                                 </div>
                               ) : null}
                               <div
-                                style={{ fontSize: "0.85rem", marginTop: 4 }}
+                                style={{ fontSize: '0.85rem', marginTop: 4 }}
                               >
                                 {formatMoney(p.cost)}
                                 {p.market > p.cost ? (
                                   <span
                                     style={{
-                                      color: "var(--color-text-muted)",
+                                      color: 'var(--color-text-muted)',
                                       marginLeft: 8,
-                                      textDecoration: "line-through",
+                                      textDecoration: 'line-through',
                                     }}
                                   >
                                     {formatMoney(p.market)}
