@@ -53,8 +53,7 @@ export function HomePage() {
           }}
         >
           Browse our catalog of booster packs, booster bundles, ETBs, and more.
-          This is an invitation-only shop. Prices and availbility are not
-          available to the public.
+          This is an invitation-only shop. Orders are not available to the public.
         </p>
 
         <Link
