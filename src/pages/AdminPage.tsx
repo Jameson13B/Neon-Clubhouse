@@ -283,7 +283,7 @@ export function AdminPage() {
     return (
       <Stack gap={4}>
         <h1 style={{ margin: 0, fontSize: "1.75rem", fontWeight: 700 }}>
-          Admin
+          Admin Dashboard
         </h1>
         <SetupBanner />
       </Stack>
@@ -298,14 +298,20 @@ export function AdminPage() {
     <Stack gap={5}>
       <div>
         <h1 style={{ margin: "0 0 8px", fontSize: "1.75rem", fontWeight: 700 }}>
-          Admin
+          Admin Dashboard
         </h1>
-        <p
-          style={{ margin: 0, color: "var(--color-text-muted)", maxWidth: 620 }}
-        >
-          Admin Only. Sign in to adjust inventory, pricing, status, and catalog
-          metadata in real time.
-        </p>
+        {!isAuthed && (
+          <p
+            style={{
+              margin: 0,
+              color: "var(--color-text-muted)",
+              maxWidth: 620,
+            }}
+          >
+            Admin Only. Sign in to adjust inventory, pricing, status, and
+            catalog metadata in real time.
+          </p>
+        )}
       </div>
 
       {!isAuthed ? (
