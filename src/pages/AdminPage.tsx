@@ -303,11 +303,8 @@ export function AdminPage() {
         <p
           style={{ margin: 0, color: "var(--color-text-muted)", maxWidth: 620 }}
         >
-          Sign in with SMS verification using a phone number that has been
-          granted admin access in Firestore (a document under the{" "}
-          <code style={{ fontFamily: "var(--font-mono)" }}>admins</code>{" "}
-          collection, named with your Firebase Auth user ID). Then you can
-          adjust inventory, pricing, status, and catalog metadata in real time.
+          Admin Only. Sign in to adjust inventory, pricing, status, and catalog
+          metadata in real time.
         </p>
       </div>
 
@@ -316,7 +313,7 @@ export function AdminPage() {
           {!codeSent ? (
             <form onSubmit={onSendCode}>
               <Stack gap={3}>
-                <strong>Administrator sign-in</strong>
+                <strong>Admin sign-in</strong>
                 <FormField label="Phone number">
                   <Input
                     type="tel"
@@ -336,9 +333,7 @@ export function AdminPage() {
                     fontSize: "0.85rem",
                   }}
                 >
-                  Complete the security check, then send the code. If SMS never
-                  arrives, check the browser console and confirm this host is in
-                  Firebase → Authentication → Authorized domains.
+                  Complete the security check, then send the code.
                 </p>
                 <div ref={recaptchaContainerRef} key={recaptchaKey} />
                 <Button type="submit" disabled={busy} style={{ width: "100%" }}>
@@ -583,7 +578,7 @@ export function AdminPage() {
                   </FormField>
                   <Stack direction="row" gap={3} wrap>
                     <div style={{ flex: "1 1 120px", minWidth: 0 }}>
-                      <FormField label="Market / MSRP (USD)">
+                      <FormField label="Market / Resale (USD)">
                         <Input
                           type="number"
                           min={0}
@@ -600,7 +595,7 @@ export function AdminPage() {
                       </FormField>
                     </div>
                     <div style={{ flex: "1 1 120px", minWidth: 0 }}>
-                      <FormField label="Cost / sale price (USD)">
+                      <FormField label="Cost / MSRP (USD)">
                         <Input
                           type="number"
                           min={0}
@@ -719,89 +714,92 @@ export function AdminPage() {
                 >
                   <Stack gap={2}>
                     {filteredInventory.map((p) => (
-                    <div
-                      key={p.id}
-                      style={{
-                        border: "1px solid var(--color-border)",
-                        borderRadius: "var(--radius-md)",
-                        padding: 12,
-                        background:
-                          editingId === p.id
-                            ? "var(--color-surface-hover)"
-                            : "var(--color-bg)",
-                      }}
-                    >
-                      <Stack gap={2}>
-                        <Stack
-                          direction="row"
-                          justify="space-between"
-                          align="flex-start"
-                          wrap
-                        >
-                          <div>
-                            <div style={{ fontWeight: 700 }}>{p.name}</div>
-                            <div
-                              style={{
-                                fontSize: "0.85rem",
-                                color: "var(--color-text-muted)",
-                              }}
-                            >
-                              {p.series} · {p.set}
-                              {p.type ? ` · ${p.type}` : ""} · Qty {p.quantity}
-                            </div>
-                            {p.contents ? (
+                      <div
+                        key={p.id}
+                        style={{
+                          border: "1px solid var(--color-border)",
+                          borderRadius: "var(--radius-md)",
+                          padding: 12,
+                          background:
+                            editingId === p.id
+                              ? "var(--color-surface-hover)"
+                              : "var(--color-bg)",
+                        }}
+                      >
+                        <Stack gap={2}>
+                          <Stack
+                            direction="row"
+                            justify="space-between"
+                            align="flex-start"
+                            wrap
+                          >
+                            <div>
+                              <div style={{ fontWeight: 700 }}>{p.name}</div>
                               <div
                                 style={{
-                                  fontSize: "0.8rem",
+                                  fontSize: "0.85rem",
                                   color: "var(--color-text-muted)",
-                                  marginTop: 4,
-                                  maxWidth: "100%",
-                                  overflow: "hidden",
-                                  textOverflow: "ellipsis",
-                                  whiteSpace: "nowrap",
                                 }}
                               >
-                                {p.contents}
+                                {p.series} · {p.set}
+                                {p.type ? ` · ${p.type}` : ""} · Qty{" "}
+                                {p.quantity}
                               </div>
-                            ) : null}
-                            <div style={{ fontSize: "0.85rem", marginTop: 4 }}>
-                              {formatMoney(p.cost)}
-                              {p.market > p.cost ? (
-                                <span
+                              {p.contents ? (
+                                <div
                                   style={{
+                                    fontSize: "0.8rem",
                                     color: "var(--color-text-muted)",
-                                    marginLeft: 8,
-                                    textDecoration: "line-through",
+                                    marginTop: 4,
+                                    maxWidth: "100%",
+                                    overflow: "hidden",
+                                    textOverflow: "ellipsis",
+                                    whiteSpace: "nowrap",
                                   }}
                                 >
-                                  {formatMoney(p.market)}
-                                </span>
+                                  {p.contents}
+                                </div>
                               ) : null}
+                              <div
+                                style={{ fontSize: "0.85rem", marginTop: 4 }}
+                              >
+                                {formatMoney(p.cost)}
+                                {p.market > p.cost ? (
+                                  <span
+                                    style={{
+                                      color: "var(--color-text-muted)",
+                                      marginLeft: 8,
+                                      textDecoration: "line-through",
+                                    }}
+                                  >
+                                    {formatMoney(p.market)}
+                                  </span>
+                                ) : null}
+                              </div>
                             </div>
-                          </div>
-                          <Badge tone={statusTone(p.status)}>
-                            {STATUS_LABELS[p.status]}
-                          </Badge>
+                            <Badge tone={statusTone(p.status)}>
+                              {STATUS_LABELS[p.status]}
+                            </Badge>
+                          </Stack>
+                          <Stack direction="row" gap={2} wrap>
+                            <Button
+                              variant="secondary"
+                              type="button"
+                              onClick={() => startEdit(p)}
+                            >
+                              Edit
+                            </Button>
+                            <Button
+                              variant="danger"
+                              type="button"
+                              onClick={() => onDelete(p.id)}
+                              disabled={busy}
+                            >
+                              Delete
+                            </Button>
+                          </Stack>
                         </Stack>
-                        <Stack direction="row" gap={2} wrap>
-                          <Button
-                            variant="secondary"
-                            type="button"
-                            onClick={() => startEdit(p)}
-                          >
-                            Edit
-                          </Button>
-                          <Button
-                            variant="danger"
-                            type="button"
-                            onClick={() => onDelete(p.id)}
-                            disabled={busy}
-                          >
-                            Delete
-                          </Button>
-                        </Stack>
-                      </Stack>
-                    </div>
+                      </div>
                     ))}
                   </Stack>
                 </div>
