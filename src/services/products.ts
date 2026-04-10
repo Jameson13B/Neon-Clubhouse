@@ -8,12 +8,12 @@ import {
   type Timestamp,
   type Unsubscribe,
   updateDoc,
-} from "firebase/firestore"
-import type { Product, ProductInput, ProductStatus } from "../types/product"
-import { PRODUCT_STATUSES } from "../types/product"
-import { getFirebase, isFirebaseConfigured } from "../lib/firebase"
+} from 'firebase/firestore'
+import type { Product, ProductInput, ProductStatus } from '../types/product'
+import { PRODUCT_STATUSES } from '../types/product'
+import { getFirebase, isFirebaseConfigured } from '../lib/firebase'
 
-const COLLECTION = "a10-clubhouse"
+const COLLECTION = 'a10-clubhouse'
 
 function mapDoc(id: string, data: Record<string, unknown>): Product {
   const rawStatus = data.status
@@ -21,20 +21,20 @@ function mapDoc(id: string, data: Record<string, unknown>): Product {
     rawStatus as ProductStatus,
   )
     ? (rawStatus as ProductStatus)
-    : "in_stock"
+    : 'in_stock'
 
   return {
     id,
-    name: String(data.name ?? ""),
-    contents: String(data.contents ?? ""),
-    set: String(data.set ?? ""),
-    series: String(data.series ?? ""),
-    type: String(data.type ?? ""),
+    name: String(data.name ?? ''),
+    contents: String(data.contents ?? ''),
+    set: String(data.set ?? ''),
+    series: String(data.series ?? ''),
+    type: String(data.type ?? ''),
     market: Number(data.market ?? 0),
-    cost: Number(data.cost ?? 0),
+    msrp: Number(data.msrp ?? 0),
     quantity: Number(data.quantity ?? 0),
     status,
-    imageUrl: String(data.imageUrl ?? ""),
+    imageUrl: String(data.imageUrl ?? ''),
     updatedAt: (data.updatedAt as Timestamp | null | undefined) ?? null,
   }
 }

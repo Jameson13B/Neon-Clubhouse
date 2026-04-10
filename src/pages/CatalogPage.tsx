@@ -49,7 +49,7 @@ function sortProducts(list: Product[], sort: SortValue): Product[] {
   const byName = (a: Product, b: Product) =>
     a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })
   const byDiscount = (a: Product, b: Product) =>
-    b.market - b.cost - (a.market - a.cost)
+    b.market - b.msrp - (a.market - a.msrp)
   const byType = (a: Product, b: Product) =>
     a.type.localeCompare(b.type, undefined, { sensitivity: 'base' }) ||
     byName(a, b)
@@ -60,16 +60,16 @@ function sortProducts(list: Product[], sort: SortValue): Product[] {
     case 'name-desc':
       return next.sort((a, b) => byName(b, a))
     case 'price-asc':
-      return next.sort((a, b) => a.cost - b.cost || byName(a, b))
+      return next.sort((a, b) => a.msrp - b.msrp || byName(a, b))
     case 'price-desc':
-      return next.sort((a, b) => b.cost - a.cost || byName(a, b))
+      return next.sort((a, b) => b.msrp - a.msrp || byName(a, b))
     case 'discount-desc':
       return next.sort(
-        (a, b) => b.market - b.cost - (a.market - a.cost) || byName(a, b),
+        (a, b) => b.market - b.msrp - (a.market - a.msrp) || byName(a, b),
       )
     case 'discount-asc':
       return next.sort(
-        (a, b) => a.market - a.cost - (b.market - b.cost) || byName(a, b),
+        (a, b) => a.market - a.msrp - (b.market - b.msrp) || byName(a, b),
       )
     case 'status': {
       const STATUS_ORDER: Record<string, number> = {
@@ -100,6 +100,7 @@ export function CatalogPage() {
   const [filterSeries, setFilterSeries] = useState('')
   const [filterSet, setFilterSet] = useState('')
   const [sort, setSort] = useState<SortValue>('status')
+  const [memberPricing, setMemberPricing] = useState(false)
 
   const typeOptions = useMemo(
     () => uniqueSortedStrings(products.map((p) => p.type)),
@@ -145,7 +146,7 @@ export function CatalogPage() {
             fontStyle: 'italic',
           }}
         >
-          Current inventory and orders available to verified customers only.
+          Member pricing available to verified customers only.
           <br />
           Product, price, inventory, and status are subject to change at any
           time.
@@ -182,7 +183,7 @@ export function CatalogPage() {
             <div
               style={{
                 display: 'flex',
-                flexWrap: 'wrap',
+                flexDirection: 'column',
                 alignItems: 'flex-end',
                 gap: 16,
               }}
@@ -194,10 +195,11 @@ export function CatalogPage() {
                   gap: 16,
                   flex: '1 1 auto',
                   minWidth: 0,
+                  width: '100%',
                 }}
               >
                 <div
-                  style={{ flex: '1 1 160px', minWidth: 140, maxWidth: 280 }}
+                  style={{ flex: '1 1 200px', minWidth: 140, maxWidth: 280 }}
                 >
                   <FormField label="Filter by type">
                     <Select
@@ -215,7 +217,7 @@ export function CatalogPage() {
                   </FormField>
                 </div>
                 <div
-                  style={{ flex: '1 1 160px', minWidth: 140, maxWidth: 280 }}
+                  style={{ flex: '1 1 200px', minWidth: 140, maxWidth: 280 }}
                 >
                   <FormField label="Filter by series">
                     <Select
@@ -233,7 +235,7 @@ export function CatalogPage() {
                   </FormField>
                 </div>
                 <div
-                  style={{ flex: '1 1 160px', minWidth: 140, maxWidth: 280 }}
+                  style={{ flex: '1 1 200px', minWidth: 140, maxWidth: 280 }}
                 >
                   <FormField label="Filter by set">
                     <Select
@@ -251,29 +253,73 @@ export function CatalogPage() {
                   </FormField>
                 </div>
               </div>
+
               <div
                 style={{
-                  flex: '0 0 auto',
-                  marginLeft: 'auto',
-                  minWidth: 200,
-                  maxWidth: 280,
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  margin: '0 auto',
+                  alignItems: 'center',
+                  gap: 16,
+                  flex: '1 1 auto',
+                  minWidth: 0,
+                  width: '100%',
                 }}
               >
-                <FormField label="Sort by">
-                  <Select
-                    value={sort}
-                    onChange={(e) => setSort(e.target.value as SortValue)}
-                    aria-label="Sort products"
-                  >
-                    {SORT_OPTIONS.map((o) => (
-                      <option key={o.value} value={o.value}>
-                        {o.label}
-                      </option>
-                    ))}
-                  </Select>
-                </FormField>
+                <div
+                  style={{
+                    flex: '1 1 160px',
+                    minWidth: 160,
+                    maxWidth: 280,
+                  }}
+                >
+                  <FormField label="Sort by">
+                    <Select
+                      value={sort}
+                      onChange={(e) => setSort(e.target.value as SortValue)}
+                      aria-label="Sort products"
+                    >
+                      {SORT_OPTIONS.map((o) => (
+                        <option key={o.value} value={o.value}>
+                          {o.label}
+                        </option>
+                      ))}
+                    </Select>
+                  </FormField>
+                </div>
+                <div
+                  style={{
+                    flex: '1 1 140px',
+                    minWidth: 140,
+                    maxWidth: 280,
+                  }}
+                >
+                  <FormField label="Member pricing">
+                    <label
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 8,
+                        fontSize: '0.9rem',
+                        color: 'var(--color-text-muted)',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={memberPricing}
+                        onChange={(e) => setMemberPricing(e.target.checked)}
+                        style={{
+                          cursor: 'pointer',
+                        }}
+                      />
+                      Members only
+                    </label>
+                  </FormField>
+                </div>
               </div>
             </div>
+
             <p
               style={{
                 margin: 0,
@@ -301,7 +347,11 @@ export function CatalogPage() {
               }}
             >
               {displayed.map((p) => (
-                <ProductCard key={p.id} product={p} />
+                <ProductCard
+                  key={p.id}
+                  product={p}
+                  memberPricing={memberPricing}
+                />
               ))}
             </div>
           )}

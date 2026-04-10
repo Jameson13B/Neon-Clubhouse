@@ -52,8 +52,11 @@ export function HomePage() {
             margin: 0,
           }}
         >
-          Browse our catalog of booster packs, booster bundles, ETBs, and more.
-          This is an invitation-only shop. Orders are not available to the public.
+          Browse our catalog of Pokemon TCG booster packs, booster bundles,
+          ETBs, and more.
+          <br />
+          <br />
+          <strong> Member pricing available to verified customers only</strong>.
         </p>
 
         <Link
@@ -102,10 +105,41 @@ export function HomePage() {
           <h2
             style={{
               color: 'var(--color-text)',
+              margin: '0 auto',
             }}
           >
             Drop Updates Coming Soon...
           </h2>
+          <p
+            style={{
+              color: 'var(--color-text-muted)',
+              marginTop: 0,
+              fontSize: '0.8rem',
+            }}
+          >
+            4/10/2026 - 10:48am
+          </p>
+          <p
+            style={{
+              color: 'var(--color-text-muted)',
+              maxWidth: 400,
+              margin: '0 auto',
+            }}
+          >
+            Details about the drop will render here. Including special notes,
+            qty limits, pricing, etc.
+          </p>
+          <ul style={{ color: 'var(--color-text-muted)' }}>
+            <li>
+              Product 1 | $29.99 - <a>Product link</a>
+            </li>
+            <li>
+              Product 2 | $39.99 - <a>Product link</a>
+            </li>
+            <li>
+              Product 3 | $49.99 - <a>Product link</a>
+            </li>
+          </ul>
         </div>
       </Stack>
     </main>

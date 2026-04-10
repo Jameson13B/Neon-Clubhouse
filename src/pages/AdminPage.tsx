@@ -29,7 +29,7 @@ function emptyForm(): ProductInput {
     series: '',
     type: '',
     market: 0,
-    cost: 0,
+    msrp: 0,
     quantity: 0,
     status: 'in_stock',
     imageUrl: '',
@@ -71,6 +71,7 @@ function displayAuthIdentity(user: User | null): string {
 }
 
 function productToForm(p: Product): ProductInput {
+  console.log('HERE2', p)
   return {
     name: p.name,
     contents: p.contents,
@@ -78,7 +79,7 @@ function productToForm(p: Product): ProductInput {
     series: p.series,
     type: p.type,
     market: p.market,
-    cost: p.cost,
+    msrp: p.msrp,
     quantity: p.quantity,
     status: p.status,
     imageUrl: p.imageUrl,
@@ -96,7 +97,7 @@ function productMatchesInventorySearch(p: Product, query: string): boolean {
     p.contents,
     STATUS_LABELS[p.status],
     String(p.quantity),
-    formatMoney(p.cost),
+    formatMoney(p.msrp),
     formatMoney(p.market),
   ]
     .join(' ')
@@ -176,6 +177,7 @@ export function AdminPage() {
     setMessage(null)
     try {
       if (editingId) {
+        console.log('HERE', form)
         await updateProduct(editingId, form)
         setMessage('Product updated.')
       } else {
@@ -584,10 +586,26 @@ export function AdminPage() {
                   </FormField>
                   <Stack direction="row" gap={3} wrap>
                     <div style={{ flex: '1 1 120px', minWidth: 0 }}>
-                      <FormField label="Market / Resale (USD)">
+                      <FormField label="MSRP">
                         <Input
                           type="number"
-                          min={0}
+                          step="0.01"
+                          value={form.msrp}
+                          onChange={(e) =>
+                            setForm((f) => ({
+                              ...f,
+                              msrp: parseFloat(e.target.value) || 0,
+                            }))
+                          }
+                          required
+                          prefix="$"
+                        />
+                      </FormField>
+                    </div>
+                    <div style={{ flex: '1 1 120px', minWidth: 0 }}>
+                      <FormField label="Market">
+                        <Input
+                          type="number"
                           step="0.01"
                           value={form.market}
                           onChange={(e) =>
@@ -597,23 +615,17 @@ export function AdminPage() {
                             }))
                           }
                           required
+                          prefix="$"
                         />
                       </FormField>
                     </div>
                     <div style={{ flex: '1 1 120px', minWidth: 0 }}>
-                      <FormField label="Cost / MSRP (USD)">
+                      <FormField label="Retail">
                         <Input
                           type="number"
-                          min={0}
-                          step="0.01"
-                          value={form.cost}
-                          onChange={(e) =>
-                            setForm((f) => ({
-                              ...f,
-                              cost: parseFloat(e.target.value) || 0,
-                            }))
-                          }
-                          required
+                          value={parseFloat((form.msrp * 1.4).toFixed(2))}
+                          readOnly
+                          prefix="$"
                         />
                       </FormField>
                     </div>
@@ -621,13 +633,20 @@ export function AdminPage() {
                       <FormField label="Quantity">
                         <Input
                           type="number"
-                          min={0}
                           step={1}
                           value={form.quantity}
                           onChange={(e) =>
                             setForm((f) => ({
                               ...f,
                               quantity: parseInt(e.target.value, 10) || 0,
+                              status:
+                                e.target.value === '0'
+                                  ? 'sold_out'
+                                  : e.target.value === '1'
+                                    ? 'locked'
+                                    : e.target.value > '1'
+                                      ? 'in_stock'
+                                      : f.status,
                             }))
                           }
                           required
@@ -767,8 +786,8 @@ export function AdminPage() {
                               <div
                                 style={{ fontSize: '0.85rem', marginTop: 4 }}
                               >
-                                {formatMoney(p.cost)}
-                                {p.market > p.cost ? (
+                                {formatMoney(p.msrp)}
+                                {p.market > p.msrp ? (
                                   <span
                                     style={{
                                       color: 'var(--color-text-muted)',
