@@ -56,16 +56,6 @@ export function HomePage() {
           This is an invitation-only shop. Orders are not available to the public.
         </p>
 
-        <div>
-          <h2
-            style={{
-              color: 'var(--color-text)',
-            }}
-          >
-            Drop Updates Coming Soon
-          </h2>
-        </div>
-
         <Link
           to="/catalog"
           style={{
@@ -107,6 +97,16 @@ export function HomePage() {
           </svg>
           Shop the Catalog
         </Link>
+
+        <div>
+          <h2
+            style={{
+              color: 'var(--color-text)',
+            }}
+          >
+            Drop Updates Coming Soon...
+          </h2>
+        </div>
       </Stack>
     </main>
   )
