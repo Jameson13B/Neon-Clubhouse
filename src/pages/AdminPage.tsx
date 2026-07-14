@@ -427,6 +427,12 @@ export function AdminPage() {
     setRecaptchaKey((k) => k + 1)
   }
 
+  const neonPrice = useMemo(() => {
+    const neonUpCharge = (form.market - form.msrp) / 2
+    console.log("Neon Price", typeof (form.msrp + neonUpCharge))
+    return form.msrp + neonUpCharge
+  }, [form.msrp, form.market])
+
   if (!configured) {
     return (
       <Stack gap={4}>
@@ -947,10 +953,10 @@ export function AdminPage() {
                       </FormField>
                     </div>
                     <div style={{ flex: "1 1 120px", minWidth: 0 }}>
-                      <FormField label="Retail">
+                      <FormField label="Neon">
                         <Input
                           type="number"
-                          value={parseFloat((form.msrp * 1.4).toFixed(2))}
+                          value={neonPrice.toFixed(2)}
                           readOnly
                           prefix="$"
                         />
@@ -1070,92 +1076,97 @@ export function AdminPage() {
                   }}
                 >
                   <Stack gap={2}>
-                    {filteredInventory.map((p) => (
-                      <div
-                        key={p.id}
-                        style={{
-                          border: "1px solid var(--color-border)",
-                          borderRadius: "var(--radius-md)",
-                          padding: 12,
-                          background:
-                            editingId === p.id
-                              ? "var(--color-surface-hover)"
-                              : "var(--color-bg)",
-                        }}
-                      >
-                        <Stack gap={2}>
-                          <Stack
-                            direction="row"
-                            justify="space-between"
-                            align="flex-start"
-                          >
-                            <div style={{ flex: 1, minWidth: 0 }}>
-                              <div style={{ fontWeight: 700 }}>{p.name}</div>
-                              <div
-                                style={{
-                                  fontSize: "0.85rem",
-                                  color: "var(--color-text-muted)",
-                                }}
-                              >
-                                {p.series} · {p.set}
-                                {p.type ? ` · ${p.type}` : ""} · Qty{" "}
-                                {p.quantity}
-                              </div>
-                              {p.contents ? (
+                    {filteredInventory.map((p) => {
+                      const neonUpCharge = (p.market - p.msrp) / 2
+                      const neonPrice = p.msrp + neonUpCharge
+
+                      return (
+                        <div
+                          key={p.id}
+                          style={{
+                            border: "1px solid var(--color-border)",
+                            borderRadius: "var(--radius-md)",
+                            padding: 12,
+                            background:
+                              editingId === p.id
+                                ? "var(--color-surface-hover)"
+                                : "var(--color-bg)",
+                          }}
+                        >
+                          <Stack gap={2}>
+                            <Stack
+                              direction="row"
+                              justify="space-between"
+                              align="flex-start"
+                            >
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <div style={{ fontWeight: 700 }}>{p.name}</div>
                                 <div
                                   style={{
-                                    fontSize: "0.8rem",
+                                    fontSize: "0.85rem",
                                     color: "var(--color-text-muted)",
-                                    marginTop: 4,
-                                    maxWidth: "100%",
-                                    overflow: "hidden",
-                                    textOverflow: "ellipsis",
                                   }}
                                 >
-                                  {p.contents}
+                                  {p.series} · {p.set}
+                                  {p.type ? ` · ${p.type}` : ""} · Qty{" "}
+                                  {p.quantity}
                                 </div>
-                              ) : null}
-                              <div
-                                style={{ fontSize: "0.85rem", marginTop: 4 }}
-                              >
-                                {formatMoney(p.msrp)}
-                                {p.market > p.msrp ? (
-                                  <span
+                                {p.contents ? (
+                                  <div
                                     style={{
+                                      fontSize: "0.8rem",
                                       color: "var(--color-text-muted)",
-                                      marginLeft: 8,
-                                      textDecoration: "line-through",
+                                      marginTop: 4,
+                                      maxWidth: "100%",
+                                      overflow: "hidden",
+                                      textOverflow: "ellipsis",
                                     }}
                                   >
-                                    {formatMoney(p.market)}
-                                  </span>
+                                    {p.contents}
+                                  </div>
                                 ) : null}
+                                <div
+                                  style={{ fontSize: "0.85rem", marginTop: 4 }}
+                                >
+                                  {formatMoney(neonPrice)}
+                                  {p.market > p.msrp ? (
+                                    <span
+                                      style={{
+                                        color: "var(--color-text-muted)",
+                                        marginLeft: 8,
+                                        textDecoration: "line-through",
+                                      }}
+                                    >
+                                      {formatMoney(p.market)}
+                                    </span>
+                                  ) : null}
+                                </div>
                               </div>
-                            </div>
-                            <Badge tone={statusTone(p.status)}>
-                              {STATUS_LABELS[p.status]}
-                            </Badge>
+                              <Badge tone={statusTone(p.status)}>
+                                {STATUS_LABELS[p.status]}
+                              </Badge>
+                            </Stack>
+                            <Stack direction="row" gap={2} wrap>
+                              <Button
+                                variant="secondary"
+                                type="button"
+                                onClick={() => startEdit(p)}
+                              >
+                                Edit
+                              </Button>
+                              <Button
+                                variant="danger"
+                                type="button"
+                                onClick={() => onDelete(p.id)}
+                                disabled={busy}
+                              >
+                                Delete
+                              </Button>
+                            </Stack>
                           </Stack>
-                          <Stack direction="row" gap={2} wrap>
-                            <Button
-                              variant="secondary"
-                              type="button"
-                              onClick={() => startEdit(p)}
-                            >
-                              Edit
-                            </Button>
-                            <Button
-                              variant="danger"
-                              type="button"
-                              onClick={() => onDelete(p.id)}
-                              disabled={busy}
-                            >
-                              Delete
-                            </Button>
-                          </Stack>
-                        </Stack>
-                      </div>
-                    ))}
+                        </div>
+                      )
+                    })}
                   </Stack>
                 </div>
               )}
